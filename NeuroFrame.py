@@ -1,9 +1,13 @@
 from tkinter import *
+from InfLabel import *
 
 class NeuroFrame(Frame):
+    RESUME = "Продолжить обучение"
+    STOP = "Остановить обучение"
     def __init__(self, parent, neuro):
         super().__init__(parent)
         self.neuro = neuro
+        self.stoped = False
         self.makeWidgets(neuro)
 
     def makeWidgets(self, neuro):
@@ -14,11 +18,36 @@ class NeuroFrame(Frame):
 
 
         fConfig = Frame(self)
-        fConfig.pack(side=BOTTOM)
-        Label(fConfig, text="Конфигурация нейросети")
+        fConfig.pack()
+        Label(fConfig, text="Конфигурация нейросети").pack(side=TOP)
         # инструменты для изменения конфигурации нейросети
 
 
-        Button(fConfig, text="")
+        Button(fConfig, text="Начать обучение", command=self.begin).pack()
+        self.bttnStopRes = Button(fConfig, text=NeuroFrame.RESUME,
+               command=self.stopResume)
+        self.bttnStopRes.pack()
+
+        self.inf = InfLabel(self)
+        self.inf.pack(side=BOTTOM)
+        self.print = self.inf.print
+
+    def begin(self):
+        self.print("Начало обучения нейросети")
+        self.neuro.begin()
+
+    def stopResume(self):
+        if self.stoped:
+            text = "Обучение нейросети продолжено"
+            self.bttnStopRes.configure(text=NeuroFrame.STOP)
+
+        else:
+            text = "Обучение нейросети простановлено"
+            self.bttnStopRes.configure(text=NeuroFrame.RESUME)
+
+        self.stoped = not self.stoped
+
+        self.print(text)
+        self.neuro.stopRes()
 
 

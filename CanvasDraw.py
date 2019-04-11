@@ -1,11 +1,13 @@
 from tkinter import *
 from tkinter.filedialog import *
 from PIL import Image as IMG
+from InfLabel import *
 import io
 import threading as th
 
 IMGDIRECTORY = ""
 FORMAT = 'png'
+
 
 class CanvasDraw(Frame):
     IMGCOUNTER = 0
@@ -53,7 +55,7 @@ class CanvasDraw(Frame):
         bttnSave.pack(side = LEFT)
         bttnSignal.pack(side=LEFT)
 
-        inf = Label(self, height=2)
+        inf = InfLabel(self)#Label(self, height=2)
         self.inf = inf
         inf.pack()
 
@@ -103,17 +105,20 @@ class CanvasDraw(Frame):
         self.print("Полотно очищено")
 
     def print(self, text=''):
+        self.inf.print(text)
+        """
         #self.inf.update_idletasks()
         self.inf.after_cancel(ALL)
         self.inf.configure(text=text)
 
-        self.inf.after(4000, lambda : self.inf.configure(text=''))
+        self.inf.after(4000, lambda : self.inf.configure(text=''))"""
 
     def signal(self):
         # Будет раелизовано позже
         # <...>
         # signal = PrimitiveImage(<params>)
         # self.output.turn(signal)
+        #self.neuro.signal()
         self.print("Сигнал отправлен")
 
 if __name__ == '__main__':

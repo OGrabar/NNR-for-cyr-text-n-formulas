@@ -1,9 +1,11 @@
 from CanvasDraw import *
 from tkinter import *
 from NeuroFrame import *
+from NeurNet import *
+
 
 class Main(Tk):
-    def __init__(self, neuro = None):
+    def __init__(self, neuro = NeurNet()):
         super().__init__()
         self.neuro = neuro
         self.makeWidgets(neuro)
