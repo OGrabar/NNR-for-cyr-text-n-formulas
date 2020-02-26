@@ -8,7 +8,7 @@ class PicHandler:
 
     def __init__(self, name):
         self.name = name
-        self.image = Image.open(f'{self.name}.jpg')
+        self.image = Image.open(f'{self.name}.png')
         self.width, self.height = self.image.size
 
 
@@ -40,8 +40,8 @@ class PicHandler:
 
 
 if __name__ == '__main__':
-    pic = [PicHandler(f'{name}') for name in '0123456789']
-
+    #pic = [PicHandler(f'{name}') for name in '0123456789']
+    pic = [PicHandler(f'{name}') for name in '012']
 
     for p in pic:
         p.Alter(30)
