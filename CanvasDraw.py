@@ -4,10 +4,14 @@ from PIL import Image as IMG
 from InfLabel import *
 import io
 import threading as th
+from NeurNet import *
+from tkinter import messagebox as mb
+
+from PicHandler import *
 
 IMGDIRECTORY = ""
 FORMAT = 'png'
-
+SIDE = 30
 
 class CanvasDraw(Frame):
     IMGCOUNTER = 0
@@ -15,10 +19,11 @@ class CanvasDraw(Frame):
     DIAM_POINT = 20
     K = 50 # На DIAM_POINT пикселей приходится K точек
 
-    def __init__(self, parent=None, color='white'):
+    def __init__(self, neuro: NeurNet=None, parent=None, color='white'):
         Frame.__init__(self, parent)
         self.start = None
         self.makeWidgets(color)
+        self.neuro = neuro
 
     def makeWidgets(self, color):
         #self.pack(expand=YES, fill=BOTH)
@@ -114,11 +119,29 @@ class CanvasDraw(Frame):
         self.inf.after(4000, lambda : self.inf.configure(text=''))"""
 
     def signal(self):
-        # Будет раелизовано позже
-        # <...>
-        # signal = PrimitiveImage(<params>)
-        # self.output.turn(signal)
-        #self.neuro.signal()
+        def getBitPic():
+            self.saveImg("signal", FORMAT)
+            p = PicHandler("signal")
+            p.Alter(SIDE)
+
+            #ins = np.array([ch for ch in [s for s in p.BlocksOfPixels(SIDE)[0]]])
+            #blocks = p.BlocksOfPixels(SIDE)[0]
+            ins = []
+            for s in p.BlocksOfPixels(SIDE)[0]:
+                for ch in s:
+                    ins.append(int(ch))
+            ins = np.array(ins)
+
+            self.neuro.setIns(ins)
+            res = self.neuro.begin()
+            print(res)
+            ans = interpretRes(res)
+            mb.showinfo("Результат", str(ans))
+
+
+        t = th.Thread(target=getBitPic)
+        t.start()
+
         self.print("Сигнал отправлен")
 
 if __name__ == '__main__':

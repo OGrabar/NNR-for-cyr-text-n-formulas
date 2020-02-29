@@ -1,5 +1,6 @@
 from tkinter import *
 from InfLabel import *
+from NeurNet import *
 
 class NeuroFrame(Frame):
     RESUME = "Продолжить обучение"
@@ -10,11 +11,17 @@ class NeuroFrame(Frame):
         self.stoped = False
         self.makeWidgets(neuro)
 
-    def makeWidgets(self, neuro):
+    def makeWidgets(self, neuro: NeurNet):
         fInfo = Frame(self)
-        fInfo.pack(side=TOP)
+        fInfo.pack(side=BOTTOM)
         Label(fInfo, text="Информация о нейросети").pack(side=TOP)
         # элементы с информацией о структуре и результатах обучения нейросети
+        txt: str = ''
+        for lay in neuro.first.layers:
+            txt += str(lay.weights)
+            txt += '\n'
+
+        #Label(fInfo, text="Матрица весов:\n" + txt).pack()
 
 
         fConfig = Frame(self)
@@ -34,7 +41,8 @@ class NeuroFrame(Frame):
 
     def begin(self):
         self.print("Начало обучения нейросети")
-        self.neuro.begin()
+        #self.neuro.begin()
+        self.bttnStopRes.configure(text=NeuroFrame.STOP)
 
     def stopResume(self):
         if self.stoped:

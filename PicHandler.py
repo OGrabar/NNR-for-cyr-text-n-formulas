@@ -1,7 +1,6 @@
 import numpy as np
 import cv2
 import os
-#from pythreshold.utils import *
 from typing import Optional, Tuple, Union
 
 
