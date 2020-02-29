@@ -42,4 +42,4 @@ class PicHandler:
         return self.img
 
 
-    vectorOfPixels = lambda self: self.d2image.flatten()
+    vectorOfPixels = lambda self: self.img.flatten()
