@@ -75,7 +75,6 @@ class PicHandler:
         kernel = np.ones((3, 3), np.uint8)
         self.img = apply_threshold(self.img,bradley_roth_threshold(self.img))
         self.img = cv2.erode(self.img, kernel, iterations=2)
-        self._show()
 
 
     ''' Opens the image window. Closed by pressing any button '''
