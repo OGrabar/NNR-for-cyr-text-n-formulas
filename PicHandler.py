@@ -2,13 +2,13 @@ import numpy as np
 from PIL import Image, PngImagePlugin, JpegImagePlugin, BmpImagePlugin
 import cv2
 import os
-from matplotlib import pyplot as plt
 from pythreshold.utils import *
 from typing import Tuple, Union
-from functools import reduce
 
 
 class PicHandler:
+
+    name = '_'
 
     def __init__(self, o : Union[str, np.ndarray, PngImagePlugin.PngImageFile, JpegImagePlugin.JpegImageFile, BmpImagePlugin.BmpImageFile], path='images/'):
         '''
@@ -32,7 +32,7 @@ class PicHandler:
 
             img = cv2.imread(f'{[path,""][path=="."]}{self.name}', cv2.IMREAD_UNCHANGED)
         elif isinstance(o, np.ndarray):
-            self.name = '.'
+            self.name = '_'
             img = o
         else:
             self.name = o.filename
@@ -48,6 +48,8 @@ class PicHandler:
             self.img = img
         else:
             raise ValueError('the input data to be interpreted as an image has more then 3 dimensions')
+
+        self.img = cv2.bitwise_not(self.img)
 
 
     def resize(self, size: Union[int, Tuple[int,int]]) -> None:
@@ -73,6 +75,7 @@ class PicHandler:
         kernel = np.ones((3, 3), np.uint8)
         self.img = apply_threshold(self.img,bradley_roth_threshold(self.img))
         self.img = cv2.erode(self.img, kernel, iterations=2)
+        self._show()
 
 
     ''' Opens the image window. Closed by pressing any button '''
@@ -96,3 +99,8 @@ class PicHandler:
 
     ''' Returns the image as a vector `np.array` '''
     vectorOfPixels = lambda self, mode=None: self.blocksOfPixels(mode).flatten()
+
+
+                        
+    def save(self, filename: str =name, path='images/'):
+        cv2.imwrite(f'{[path,""][path=="."]}{["_.png",filename][bool(filename and len(filename.split("."))>1)]}', self.img)
