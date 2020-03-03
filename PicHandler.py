@@ -40,8 +40,6 @@ class PicHandler:
 
         if len(img.shape) == 3:
             if img.shape[2] == 4:
-                # *a, b = cv2.split(img)
-                # self.img = reduce(cv2.add, (*a, cv2.bitwise_not(b)))
                 *_, b = cv2.split(img)
                 self.img = cv2.bitwise_not(b)
             else:
