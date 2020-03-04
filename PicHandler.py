@@ -41,7 +41,7 @@ class PicHandler:
         if len(img.shape) == 3:
             if img.shape[2] == 4:
                 *_, b = cv2.split(img)
-                self.img = cv2.bitwise_not(b)
+                self.img = [cv2.bitwise_not(b), cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)][int(np.amax(b))==int(np.amin(b))]
             else:
                 self.img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         elif len(img.shape) == 2:
@@ -52,11 +52,11 @@ class PicHandler:
         self.img = cv2.bitwise_not(self.img)
 
 
-    def resize(self, size: Union[int, Tuple[int,int]]) -> None:
+    def resize(self, size: Union[int, Tuple[int,int]]) -> 'PicHandler':
         '''
         Resizes the 'self.img'. If the 'size' is `tuple`, nonproportial resize, if `int` - proportional
         :param size: (width `int`, height `int`) or `int`
-        :return: None
+        :return: PicHandler
         '''
         if isinstance(size, int):
             n, m = map(lambda a: int(size / max(self.img.shape) * a), self.img.shape)
@@ -66,15 +66,18 @@ class PicHandler:
         else:
             self.img = cv2.resize(self.img, size, [cv2.INTER_AREA, cv2.INTER_CUBIC][size < self.img.shape])
 
+        return self
 
-    def alter(self):
+
+    def alter(self) -> 'PicHandler':
         '''
         Applies filter on the 'self.img'
-        :return: None
+        :return: PicHandler
         '''
         kernel = np.ones((3, 3), np.uint8)
         self.img = apply_threshold(self.img,bradley_roth_threshold(self.img))
         self.img = cv2.erode(self.img, kernel, iterations=2)
+        return self
 
 
     ''' Opens the image window. Closed by pressing any button '''
@@ -84,7 +87,7 @@ class PicHandler:
     def blocksOfPixels(self, mode:Union[str,int]=None) -> np.ndarray:
         '''
         Returns the image as matrix.
-        :param mode: `str` or `int`. To change the value of white color (255 to mode)
+        :param mode: `str` or `int`. To change the value of black color (from 255 to mode)
         :return: `np.dnarray`
         '''
         if mode:
@@ -100,6 +103,11 @@ class PicHandler:
     vectorOfPixels = lambda self, mode=None: self.blocksOfPixels(mode).flatten()
 
 
-                        
-    def save(self, filename: str =name, path='images/'):
+    def save(self, filename: str =name, path='images/') -> None:
+        '''
+        Saves the PicHander's internal image with specified filename with passed path
+        :param filename: `str`. name and extentsion of the file. If extension isn't specified, .png is default
+        :param path: `str`, optional. the path where to save the internal image, pass '' or '.' to set the path to the current directory
+        :return: None
+        '''
         cv2.imwrite(f'{[path,""][path=="."]}{["_.png",filename][bool(filename and len(filename.split("."))>1)]}', self.img)
