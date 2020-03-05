@@ -13,13 +13,6 @@ from pybrain.supervised.trainers import BackpropTrainer
 
 RELU, SIGMOID, TANH = 'relu', 'sigmoid', 'tanh'
 
-def interpretRes(res: np.array):
-    #vars = [i for i in range(10)]
-    t = max(res)
-
-    return list(res).index(t)
-
-
 class NeurNet:
     nn: pybrain.Network
     ds: SupervisedDataSet
