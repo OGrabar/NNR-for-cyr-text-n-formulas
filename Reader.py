@@ -25,8 +25,7 @@ class Reader:
 
         p = Parser()
         t, *text_blocks = p.divBlocks(self.name)
-        n = createNeurNet()
-        re = Recognizer(t, n, t.pos)
+        re = Recognizer(t, createNeurNet())
         recognized = [re.rec()]
         for i in text_blocks:
             re.setBlock(i)
