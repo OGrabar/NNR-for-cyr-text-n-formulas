@@ -3,6 +3,7 @@ import os
 import Parser
 import Recognizer
 import Translator
+from createNeurNet import createNeurNet
 
 
 class Reader:
@@ -22,11 +23,10 @@ class Reader:
 
     def read(self):
 
-        p = Parser(self.name)
-        text_blocks = p.divBlocks()
-        *r, = map(Recognizer, text_blocks)
+        p = Parser()
+        text_blocks = p.divBlocks(self.name)
+        n = createNeurNet()
+        *r, = [Recognizer(i, n, i.pos) for i in text_blocks]
         recognized = [_.rec() for _ in r]
-        *translated, = map(Translator, recognized)
-        # or maybe:
-        # t=Translator(recognized)
-        # t.translate()
+        t=Translator(recognized)
+        t.translate(self.name.split('.')[0])
