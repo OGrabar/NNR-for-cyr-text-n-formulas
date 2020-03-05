@@ -24,9 +24,12 @@ class Reader:
     def read(self):
 
         p = Parser()
-        text_blocks = p.divBlocks(self.name)
+        t, *text_blocks = p.divBlocks(self.name)
         n = createNeurNet()
-        *r, = [Recognizer(i, n, i.pos) for i in text_blocks]
-        recognized = [_.rec() for _ in r]
+        re = Recognizer(t, n, t.pos)
+        recognized = [re.rec()]
+        for i in text_blocks:
+            re.setBlock(i)
+            recognized.append(re.rec())
         t=Translator(recognized)
         t.translate(self.name.split('.')[0])
