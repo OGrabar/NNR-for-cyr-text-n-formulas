@@ -18,7 +18,7 @@ class NeurNet:
     ds: SupervisedDataSet
     trainer: BackpropTrainer
 
-    def __init__(self, layers: Tuple[int,], func: Union[RELU, SIGMOID, TANH] =RELU):
+    def __init__(self, layers: Tuple[int,], func: Union[RELU, SIGMOID, TANH] =SIGMOID, learning_rate: float =0.01):
         if func == RELU:
             hc = ReluLayer
         elif func == SIGMOID:
@@ -27,9 +27,9 @@ class NeurNet:
             hc = TanhLayer
         else:
             raise Exception("Invalid func param")
-        self.nn = buildNetwork(*layers, hiddenclass=hc)
+        self.nn = buildNetwork(*layers, hiddenclass=hc, )
         self.ds = SupervisedDataSet(layers[0], layers[-1])
-        self.trainer = BackpropTrainer(self.nn, self.ds)
+        self.trainer = BackpropTrainer(self.nn, self.ds, learningrate=learning_rate)
 
     def signal(self, ins: np.ndarray) -> np.ndarray:
         return self.nn.activate(ins)
@@ -48,4 +48,6 @@ class NeurNet:
 
     def load(self, filename: str = 'default'):
         other = saving.loadObj(filename + '.nn')
-        self.nn, self.ds, self.trainer = other.nn, other.ds, other.trainer
+        f, l = other.nn.indim, other.nn.outdim
+        self.nn, self.ds, self.trainer = other.nn, SupervisedDataSet(f, l),\
+                                other.trainer
