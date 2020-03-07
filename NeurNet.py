@@ -44,10 +44,13 @@ class NeurNet:
         return self.trainer.train()
 
     def save(self, filename: str = 'default'):
+        t = self.ds
+        f, l = self.nn.indim, self.nn.outdim
+        self.ds = SupervisedDataSet(f, l)
         saving.saveObj(self, filename + '.nn')
+        self.ds = t
 
     def load(self, filename: str = 'default'):
         other = saving.loadObj(filename + '.nn')
         f, l = other.nn.indim, other.nn.outdim
-        self.nn, self.ds, self.trainer = other.nn, SupervisedDataSet(f, l),\
-                                other.trainer
+        self.nn, self.ds, self.trainer = other.nn, other.ds, other.trainer
