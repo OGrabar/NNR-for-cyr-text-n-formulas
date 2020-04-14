@@ -19,9 +19,10 @@ class Formula:
 
     TOP = 'top'
     LOW = 'low'
-    HAS_LIMITS = {'frac', 'int', 'sum'}
+    HAS_LIMITS = {'\\frac', '\\int', '\\sum'}
     INF = 9999
     CENTER_DY = 0.15
+    NOSYMB = {'\\frac'}
 
 
     def __init__(self, elemBlocks: List[ElemBlock]):
@@ -129,18 +130,43 @@ class Formula:
             if b == elemBlock:
                 return d
 
+    @staticmethod
+    def noSymb(string: str) -> bool:
+        # Возвращает True, если данная команда Latex имеет пределы, передаваемые в аргументах {}{}
+        if string in Formula.NOSYMB:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def findDirection(yLine: int, second: ElemBlock) -> int:
+        # 0 -- на одном уровне; 1 -- second - степень first; -1 -- second - индекс first
+        y2 = second.getPos().center().y
+        if Formula.onLine(yLine, second):
+            return 0
+        elif yLine < y2:
+            return 1
+        else:
+            return -1
+
     def recognize_structure(self, elemBlocks: List[ElemBlock], limits: List[Tuple[ElemBlock, Dict]]) -> None:
         # метод создает tex-код для данной формулы
         Formula.sortBlocks(elemBlocks)
         self.texCode = ''
+        yLine = elemBlocks[0].getPos().center().y
 
+        #for i in range(len(elemBlocks)):
+        #    block = elemBlocks[i]
         for block in elemBlocks:
-            self.texCode += block.getOutput()
+
+            # добавление пределов для block (если они есть)
             if Formula.hasLimits(block):
+                self.texCode += block.getOutput()
                 lims = Formula.findLimits(block, limits)
 
                 s = ''
-                if block.getOutput() != FRAC:
+                symb = not Formula.noSymb(block.getOutput())
+                if symb:
                     s += '_'
 
                 for lowBlock in lims[Formula.LOW]:
@@ -148,9 +174,22 @@ class Formula:
                 self.texCode += '{%s}' % s
 
                 s = ''
-                if block.getOutput() != FRAC:
+                if symb:
                     s += '^'
 
                 for topBlock in lims[Formula.TOP]:
                     s += topBlock.getOutput()
                 self.texCode += '{%s}' % s
+
+            direct = Formula.findDirection(yLine, block)
+            if direct == -1:
+                # block -- индекс
+                self.texCode += '_{%s}' % block.getOutput()
+            elif direct == 1:
+                # block -- степень
+                self.texCode += '^{%s}' % block.getOutput()
+            else:
+                # block идет на одном уровне с предыдущим символом
+                self.texCode += '{%s}' % block.getOutput()
+                yLine = block.getPos().center().y
+
