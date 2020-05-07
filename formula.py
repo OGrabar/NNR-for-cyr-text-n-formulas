@@ -7,6 +7,7 @@
 from __future__ import annotations
 from typing import *
 from ElemBlock import ElemBlock
+from pylatex import Math
 
 
 FRAC = '\\frac'
@@ -29,6 +30,7 @@ class Formula:
         self.subformulas = dict()
         limits, elemBlocks = self.recognizeLimits(elemBlocks)
         self.recognize_structure(elemBlocks, limits)
+        self.pos = elemBlocks[0].getPos()
 
     def recognizeLimits(self, elemBlocks: List[ElemBlock]) \
             -> Tuple[List[Tuple[ElemBlock, Dict[Union[Formula.TOP, Formula.LOW], List[ElemBlock]]]], List[ElemBlock]]:
@@ -55,10 +57,7 @@ class Formula:
     @staticmethod
     def hasLimits(block: ElemBlock) -> bool:
         # Возвращает True, если block содержит символ, имеющий верхний и нижний пределы, иначе False
-        if block.getOutput() in Formula.HAS_LIMITS:
-            return True
-        else:
-            return False
+        return block.getOutput() in Formula.HAS_LIMITS
 
     @staticmethod
     def findBlocks(block: ElemBlock, elemBlocks: List[ElemBlock], side: Union[Formula.TOP, Formula.LOW]) \
@@ -98,31 +97,16 @@ class Formula:
     @staticmethod
     def onLine(yLine: int, block: ElemBlock) -> bool:
         cy = block.getPos().center().y
-        if abs(cy - yLine) / block.getPos().h < Formula.CENTER_DY:
-            return True
-        else:
-            return False
+        return abs(cy - yLine) / block.getPos().h < Formula.CENTER_DY
 
     @staticmethod
     def inDirection(yLine: int, block: ElemBlock, side: Union[Formula.TOP, Formula.LOW]) -> bool:
-        if side == Formula.TOP:
-            if block.getPos().top() < yLine:
-                return True
-        else:
-            if block.getPos().bottom() > yLine:
-                return True
-
-        return False
+        return side == Formula.TOP and block.getPos().top() < yLine or block.getPos().bottom() > yLine
 
     @staticmethod
     def sortBlocks(elemBlocks: List[ElemBlock]) -> None:
         # сортирует список блоков (в порядке возрастания горизонтальной координаты)
-        for i in range(len(elemBlocks)):
-            for j in range(i + 1, len(elemBlocks) - 1):
-                x1 = elemBlocks[i].getPos().center().x
-                x2 = elemBlocks[j].getPos().center().x
-                if x1 > x2:
-                    elemBlocks[i], elemBlocks[j] = elemBlocks[j], elemBlocks[i]
+        elemBlocks.sort(lambda _: _.getPos().center().x)
 
     @staticmethod
     def findLimits(elemBlock: ElemBlock, limits: List) -> Dict:
@@ -133,10 +117,7 @@ class Formula:
     @staticmethod
     def noSymb(string: str) -> bool:
         # Возвращает True, если данная команда Latex имеет пределы, передаваемые в аргументах {}{}
-        if string in Formula.NOSYMB:
-            return True
-        else:
-            return False
+        return string in Formula.NOSYMB
 
     @staticmethod
     def findDirection(yLine: int, second: ElemBlock) -> int:
@@ -155,8 +136,6 @@ class Formula:
         self.texCode = ''
         yLine = elemBlocks[0].getPos().center().y
 
-        #for i in range(len(elemBlocks)):
-        #    block = elemBlocks[i]
         for block in elemBlocks:
 
             # добавление пределов для block (если они есть)
@@ -164,32 +143,26 @@ class Formula:
                 self.texCode += block.getOutput()
                 lims = Formula.findLimits(block, limits)
 
-                s = ''
-                symb = not Formula.noSymb(block.getOutput())
-                if symb:
-                    s += '_'
+                s = '_' * (symb := not Formula.noSymb(block.getOutput()))
+
 
                 for lowBlock in lims[Formula.LOW]:
                     s += lowBlock.getOutput()
-                self.texCode += '{%s}' % s
+                self.texCode += s
 
-                s = ''
-                if symb:
-                    s += '^'
+                s = '^' * symb
 
                 for topBlock in lims[Formula.TOP]:
                     s += topBlock.getOutput()
-                self.texCode += '{%s}' % s
+                self.texCode += s
 
             direct = Formula.findDirection(yLine, block)
-            if direct == -1:
-                # block -- индекс
-                self.texCode += '_{%s}' % block.getOutput()
-            elif direct == 1:
-                # block -- степень
-                self.texCode += '^{%s}' % block.getOutput()
-            else:
-                # block идет на одном уровне с предыдущим символом
-                self.texCode += '{%s}' % block.getOutput()
-                yLine = block.getPos().center().y
+            self.texCode += f'{["","^","_"][direct]}{block.getOutput()}' # 0 - empty; 1 - ^; -1 - _
+            yLine = block.getPos().center().y
 
+    def getOutput(self) -> ElemBlock(Math, Position) :
+        '''
+        The function to return the results
+        :return: ElemBlock with Math instance, which represents the obtained formula
+        '''
+        return ElemBlock(Math(inline=True, data=[NoEscape(self.texCode)]), self.pos)
