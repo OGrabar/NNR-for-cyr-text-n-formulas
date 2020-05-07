@@ -17,7 +17,7 @@ class Translator:
         doc.append(NoEscape(r'\noindent'))
 
         for block in self.blocks:
-            doc.append([Math(data=[NoEscape(out:=block.getOutput())], inline=True), out]['\\' not in out])
+            doc.append(block.getOutput()) # hence formulas are wrapped in `ElemBlock`
 
         babel = Package('babel', 'english, russian')
         fontenc = Package('fontenc', 'T2A')
