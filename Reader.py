@@ -3,6 +3,7 @@ import os
 from Parser import Parser
 from Recognizer import Recognizer
 from Translator import Translator
+from Formula import Formula
 from createNeurNet import createNeurNet
 
 
@@ -22,12 +23,16 @@ class Reader:
 
 
     def read(self):
-        p = Parser()
-        t, *text_blocks = p.divBlocks(self.name)
+        p = Parser(self.name)                                # how to interact with Parser?
+        t, *text_blocks = p.getTextBlocks()         # ?
+        formula_blocks = p.getFormulaBlocks()       # ?
         re = Recognizer(t, createNeurNet())
+
         recognized = [re.rec()]
         for i in text_blocks:
             re.setBlock(i)
             recognized.append(re.rec())
+        recognized += [Formula(i).getOutput() for i in formula_blocks]
+
         t = Translator(recognized)
         t.translate(self.name.split('.')[0])
