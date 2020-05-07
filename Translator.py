@@ -29,12 +29,3 @@ class Translator:
             doc.generate_pdf(filename, clean_tex=False)
         except Exception as e:
             print(e)
-
-
-
-if __name__ == '__main__':
-
-    # elems = [ElemBlock(chr(1072+i), (i,2))for i in range(32)]
-    # e = [ElemBlock(chr(65+i), (46-i,1))for i in range(32)]
-    # Translator(elems+e).translate('yay')
-    Translator([ElemBlock('a', (0,0)), ElemBlock(r'\frac{5}{4}', (0,1)), ElemBlock('b', (0,2))]).translate('f')
