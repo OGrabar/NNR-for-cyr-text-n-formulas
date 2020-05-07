@@ -55,7 +55,10 @@ class Formula:
     @staticmethod
     def hasLimits(block: ElemBlock) -> bool:
         # Возвращает True, если block содержит символ, имеющий верхний и нижний пределы, иначе False
-        return block.getOutput() in Formula.HAS_LIMITS
+        if block.getOutput() in Formula.HAS_LIMITS:
+            return True
+        else:
+            return False
 
     @staticmethod
     def findBlocks(block: ElemBlock, elemBlocks: List[ElemBlock], side: Union[Formula.TOP, Formula.LOW]) \
@@ -95,18 +98,31 @@ class Formula:
     @staticmethod
     def onLine(yLine: int, block: ElemBlock) -> bool:
         cy = block.getPos().center().y
-        return abs(cy - yLine) / block.getPos().h < Formula.CENTER_DY
+        if abs(cy - yLine) / block.getPos().h < Formula.CENTER_DY:
+            return True
+        else:
+            return False
 
     @staticmethod
     def inDirection(yLine: int, block: ElemBlock, side: Union[Formula.TOP, Formula.LOW]) -> bool:
         if side == Formula.TOP:
-            return block.getPos().top() < yLine or block.getPos().bottom() > yLine
+            if block.getPos().top() < yLine:
+                return True
+        else:
+            if block.getPos().bottom() > yLine:
+                return True
+
         return False
 
     @staticmethod
     def sortBlocks(elemBlocks: List[ElemBlock]) -> None:
         # сортирует список блоков (в порядке возрастания горизонтальной координаты)
-        elemBlocks.sort(key=lambda _: _.getPos().center().x)
+        for i in range(len(elemBlocks)):
+            for j in range(i + 1, len(elemBlocks) - 1):
+                x1 = elemBlocks[i].getPos().center().x
+                x2 = elemBlocks[j].getPos().center().x
+                if x1 > x2:
+                    elemBlocks[i], elemBlocks[j] = elemBlocks[j], elemBlocks[i]
 
     @staticmethod
     def findLimits(elemBlock: ElemBlock, limits: List) -> Dict:
@@ -117,7 +133,10 @@ class Formula:
     @staticmethod
     def noSymb(string: str) -> bool:
         # Возвращает True, если данная команда Latex имеет пределы, передаваемые в аргументах {}{}
-        return string in Formula.NOSYMB
+        if string in Formula.NOSYMB:
+            return True
+        else:
+            return False
 
     @staticmethod
     def findDirection(yLine: int, second: ElemBlock) -> int:
@@ -145,13 +164,18 @@ class Formula:
                 self.texCode += block.getOutput()
                 lims = Formula.findLimits(block, limits)
 
-                s = '_' * (not Formula.noSymb(block.getOutput()))
+                s = ''
+                symb = not Formula.noSymb(block.getOutput())
+                if symb:
+                    s += '_'
 
                 for lowBlock in lims[Formula.LOW]:
                     s += lowBlock.getOutput()
                 self.texCode += '{%s}' % s
 
-                s = '^' * (if symb)
+                s = ''
+                if symb:
+                    s += '^'
 
                 for topBlock in lims[Formula.TOP]:
                     s += topBlock.getOutput()
