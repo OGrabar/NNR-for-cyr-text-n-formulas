@@ -32,7 +32,7 @@ class Reader:
         for i in text_blocks:
             re.setBlock(i)
             recognized.append(re.rec())
-        recognized += [Formula(i).getOutput() for i in formula_blocks]
+        recognized += [Formula(i).getFormula() for i in formula_blocks]
 
         t = Translator(recognized)
         t.translate(self.name.split('.')[0])
