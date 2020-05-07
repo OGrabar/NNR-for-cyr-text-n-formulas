@@ -160,7 +160,7 @@ class Formula:
             self.texCode += f'{["","^","_"][direct]}{block.getOutput()}' # 0 - empty; 1 - ^; -1 - _
             yLine = block.getPos().center().y
 
-    def getOutput(self) -> ElemBlock(Math, Position) :
+    def getFormula(self) -> ElemBlock(Math, Position) :
         '''
         The function to return the results
         :return: ElemBlock with Math instance, which represents the obtained formula
