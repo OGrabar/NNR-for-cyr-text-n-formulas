@@ -52,7 +52,7 @@ class Parser:
 
     
 
-    def words_segmentation(line_pic_handler:PicHandler) -> List[PicHandler]:
+    def words_segmentation(line_pic_handler:PicHandler, minArea = 300) -> List[PicHandler]:
         SIZE = 40
 
         image = line_pic_handler.img
