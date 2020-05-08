@@ -37,7 +37,8 @@ class Parser:
                         break
         
 
-        width = pic_handler.image.shape[1]
+        (width, ) = pic_handler.image.shape
+
 
         top = 0
         bottom = 0
