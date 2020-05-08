@@ -1,4 +1,3 @@
-from operator import methodcaller
 from typing import List
 
 from ElemBlock import ElemBlock
@@ -10,12 +9,11 @@ class Translator:
     def __init__(self, blocks: List[ElemBlock]):
         self.blocks = sorted(blocks, key=lambda _:_.getPos()[::-1])
 
-
     def translate(self, filename: str):
         doc = Document('basic')
 
         doc.append(NoEscape(r'\noindent'))
-
+        
         for block in self.blocks:
             doc.append(block.getOutput()) # hence formulas are wrapped in `ElemBlock`
 

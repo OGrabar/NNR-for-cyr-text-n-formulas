@@ -102,3 +102,15 @@ class Position:
     # returns random point in position
     def random_point(self):
         return Point(randrange(self.x, stop=self.x+self.w), randrange(self.y, stop=self.y+self.h))
+
+    def left(self):
+        return self.x
+    def right(self):
+        return self.x + self.w
+    def top(self):
+        return self.y
+    def bottom(self):
+        return self.y + self.h
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y and self.h == other.h and self.w == other.w
