@@ -39,6 +39,7 @@ class Parser:
 
         (width, ) = pic_handler.image.shape
 
+
         top = 0
         bottom = 0
         for i in range(len(subarrays)):

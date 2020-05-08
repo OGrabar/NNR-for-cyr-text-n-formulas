@@ -110,3 +110,11 @@ class PicHandler:
 
     '''returns vector of the image `np.ndarray`'''
     vectorOfPixels = lambda self: self.blocksOfPixels().flatten()
+
+
+    '''thinning the line of the image using Zhang-Suen algorithm
+    Operates on a copy, not on the internal image
+    
+    :return: `np.ndarray` of [0, 1]
+    '''
+    thinning = lambda self: cv2.ximgproc.thinning(cv2.bitwise_not(self.img.copy()))
