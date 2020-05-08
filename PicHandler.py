@@ -105,7 +105,7 @@ class PicHandler:
         size = square*max(arr.shape) and resize*30
         if size:
             arr = self.__resize(size, arr)
-        return np.vectorize(lambda _: min(_, 1))(cv2.bitwise_not(arr))
+        return cv2.bitwise_not(arr).clip(max=1)
 
 
     '''returns vector of the image `np.ndarray`'''
@@ -117,4 +117,4 @@ class PicHandler:
     
     :return: `np.ndarray` of [0, 1]
     '''
-    thinning = lambda self: cv2.ximgproc.thinning(cv2.bitwise_not(self.img.copy()))
+    thinning = lambda self:np.invert(cv2.ximgproc.thinning(np.invert(self.img.copy()))).clip(max=1)
