@@ -43,7 +43,7 @@ def get_near_positions(position: Tuple[int, int], maxX: int, maxY: int, minX: in
                 res.append(pos)
     return res
 
-def create_lists(img_matrix: np.ndarray, max_dist: int =1) -> Tuple[np.ndarray, List[Tuple[int, int]]]:
+def create_lists(img_matrix: np.ndarray, max_dist: int =1) -> Tuple[List[List[int]], List[Tuple[int, int]]]:
     # возвращает списки смежности для графа, соответствующего изображению, и таблицу соответствий № -- позиция
     res = []
     table = []
@@ -141,7 +141,8 @@ def create_segment_matrix(img_matrix: np.ndarray, pos: Position, component: List
 
 class Parser:
     MIN_SPACE_TEXT = 20
-    MIN_SPACE_FORMULA = 5
+    MIN_SPACE_FORMULA = 10
+    MIN_COMPONENT_SIZE = 10
     @staticmethod
     def divBlocks(img_name: str, path: str ='D:\\Project\\', math: bool =True) -> List[TextBlock]:
         # math -- режим математических формул -> миним. расст. между разными блоками min_dist = 2
@@ -153,14 +154,20 @@ class Parser:
             min_dist = Parser.MIN_SPACE_TEXT
 
         ph = PicHandler(img_name, path=path)
-        ph.alter()
+        ph.alter()._show()
         img_matrix = ph.blocksOfPixels()
-
-        PicHandler(np.full_like(img_matrix, 255) - 255 * img_matrix)._show()  ###
 
         lists, table = create_lists(img_matrix, 1)
 
         connected_components = find_connected_components(lists)
+        l = len(connected_components)
+        i = 0
+        while i < l:
+            if len(connected_components[i]) < Parser.MIN_COMPONENT_SIZE:
+                connected_components.pop(i)
+                l -= 1
+            i += 1
+
         connected_components = unite_components(connected_components, table, min_dist-1)
 
         for comp in connected_components:
@@ -168,12 +175,16 @@ class Parser:
 
             pic_handler = PicHandler(create_segment_matrix(img_matrix, position, comp, table))
 
+            position.x, position.y = position.y, position.x
+            position.w, position.h = position.h, position.w
+
+
             text_blocks.append(TextBlock(position, pic_handler))
 
         return text_blocks
 
 
 if __name__ == '__main__':
-    bs = Parser().divBlocks("img.png", math=True)
+    bs = Parser().divBlocks("f2.jpg", math=True)
     for b in bs:
         PicHandler(np.full_like(b.getImg().img, 255) - 255 * b.getImg().img)._show()
