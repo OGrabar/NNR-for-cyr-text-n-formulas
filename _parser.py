@@ -140,9 +140,9 @@ def create_segment_matrix(img_matrix: np.ndarray, pos: Position, component: List
 
 
 class Parser:
-    MIN_SPACE_TEXT = 20
-    MIN_SPACE_FORMULA = 10
-    MIN_COMPONENT_SIZE = 10
+    MIN_SPACE_TEXT = 60
+    MIN_SPACE_FORMULA = 40
+    MIN_COMPONENT_SIZE = 20
     @staticmethod
     def divBlocks(img_name: str, path: str ='D:\\Project\\', math: bool =True) -> List[TextBlock]:
         # math -- режим математических формул -> миним. расст. между разными блоками min_dist = 2
@@ -166,7 +166,8 @@ class Parser:
             if len(connected_components[i]) < Parser.MIN_COMPONENT_SIZE:
                 connected_components.pop(i)
                 l -= 1
-            i += 1
+            else:
+                i += 1
 
         connected_components = unite_components(connected_components, table, min_dist-1)
 
